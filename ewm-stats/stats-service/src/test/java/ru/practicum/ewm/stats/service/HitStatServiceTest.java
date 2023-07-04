@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Sql(value = {"/schema-test.sql"})
+@Sql(value = {"/schema.sql"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class HitStatServiceTest {
     private MockMvc mockMvc;
@@ -53,7 +53,7 @@ class HitStatServiceTest {
 
     @SneakyThrows
     @Test
-    @Sql(value = {"/schema-test.sql", "/create-test-hits.sql" })
+    @Sql(value = {"/schema.sql", "/create-test-hits.sql" })
     @Order(1)
     void getStatNotUniqueIpTest() {
         String start = "2023-06-01 00:00:00";

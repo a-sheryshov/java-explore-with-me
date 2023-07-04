@@ -5,6 +5,7 @@ import lombok.Setter;
 import ru.practicum.ewm.stats.dto.StatDto;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
@@ -59,8 +60,10 @@ public class Hit {
     @JoinColumn(name = "app_id")
     private App app;
     @Column(name = "uri")
+    @Size(max = 100, message = "Should be less than 100 symbols")
     private String uri;
     @Column(name = "ip")
+    @Size(max = 50, message = "Should be less than 50 symbols")
     private String ip;
     @Column(name = "timestamp")
     private LocalDateTime timeStamp;
