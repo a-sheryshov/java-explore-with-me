@@ -14,5 +14,4 @@ public interface StatsClient {
 
     List<StatDto> getStat(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique);
 
-    List<StatDto> getStat(List<String> uris);
 }

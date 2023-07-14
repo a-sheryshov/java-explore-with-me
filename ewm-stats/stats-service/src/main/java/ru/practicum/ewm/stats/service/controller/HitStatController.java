@@ -36,14 +36,16 @@ public class HitStatController {
     }
 
     @GetMapping("/stats")
-    public List<StatDto> readStats(@RequestParam(defaultValue = "2000-01-01 00:00:00")
-                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                    LocalDateTime start,
-                                    @RequestParam(defaultValue = "2100-01-01 00:00:00")
-                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                    LocalDateTime end,
-                                    @RequestParam(required = false) List<String> uris,
-                                    @RequestParam(defaultValue = "false") boolean unique) {
+    public List<StatDto> readStats(@RequestParam
+                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss",
+                                               fallbackPatterns = {"yyyy-MM-dd'T'HH:mm:ss[.SSSSSS][.SSSSS][.SSSS][.SSS]"})
+                                       LocalDateTime start,
+                                   @RequestParam
+                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss",
+                                               fallbackPatterns = {"yyyy-MM-dd'T'HH:mm:ss[.SSSSSS][.SSSSS][.SSSS][.SSS]"})
+                                       LocalDateTime end,
+                                   @RequestParam(required = false) List<String> uris,
+                                   @RequestParam(defaultValue = "false") boolean unique) {
         return hitStatService.readStats(start, end, uris, unique);
     }
 }
