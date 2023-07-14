@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.stats.dto.HitRequestDto;
+import ru.practicum.ewm.stats.dto.HitsRequestDto;
 import ru.practicum.ewm.stats.dto.StatDto;
 
 
@@ -21,19 +22,46 @@ import java.util.List;
 @Slf4j
 public class StatsClientImpl implements StatsClient {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    @Value("${stats-client.uri}")
-    private final String uri;
+    @Value("${stats-server.uri}")
+    private String uri;
+
 
     @Override
     public void saveHit(HitRequestDto dto) {
-        Unirest.post(uri + "/hit").body(dto);
-        log.info("Hit POST request (ip = {}, url = {}) was sent", dto.getIp(), dto.getUri());
+        try {
+            Unirest.post(uri + "/hit")
+                    .body(dto)
+                    .contentType("application/json")
+                    .asEmpty();
+            log.info("Hit POST request (ip = {}, uri = {}) was sent", dto.getIp(), dto.getUri());
+        } catch (RuntimeException e) {
+            log.info(e.getMessage());
+        }
+    }
+
+    @Override
+    public void saveHits(HitsRequestDto dto) {
+        try {
+            Unirest.post(uri + "/hits")
+                    .body(dto)
+                    .contentType("application/json")
+                    .asEmpty();
+            log.info("Hits POST request (ip = {}, uri.count = {}) was sent", dto.getIp(), dto.getUris().size());
+        } catch (RuntimeException ex) {
+            log.info(ex.getMessage());
+        }
     }
 
     @Override
     public List<StatDto> getStat(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        log.info("Stat GET request (uris = {}) was sent", uris);
+        log.info("Stat filtered GET request (uris = {}) was sent", uris);
         return get(encodeTime(start), encodeTime(end), uris, unique);
+    }
+
+    @Override
+    public List<StatDto> getStat(List<String> uris) {
+        log.info("Stat GET request (uris = {}) was sent", uris);
+        return get(uris);
     }
 
     private String encodeTime(LocalDateTime time) {
@@ -45,8 +73,16 @@ public class StatsClientImpl implements StatsClient {
         return Unirest.get(uri + "/stats")
                 .queryString("start", start)
                 .queryString("end", end)
-                .queryString("uris", uris)
                 .queryString("unique", unique)
+                .queryString("uris", uris)
+                .asObject(new GenericType<List<StatDto>>(){})
+                .getBody();
+    }
+
+    private List<StatDto> get(List<String> uris) {
+        return Unirest.get(uri + "/stats")
+                .queryString("unique", true)
+                .queryString("uris", uris)
                 .asObject(new GenericType<List<StatDto>>(){})
                 .getBody();
     }
