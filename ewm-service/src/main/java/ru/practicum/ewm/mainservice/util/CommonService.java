@@ -249,14 +249,19 @@ public class CommonService {
 
     //STATS
     public Map<Long, Integer> findEventsViews(List<Event> events) {
+        Optional<LocalDateTime> start = events.stream().map(Event::getCreatedOn).filter(Objects::nonNull)
+                .min(Comparator.naturalOrder());
         return toStatsMap(
-                statsClient.getStat(fillUris(events))
+                statsClient.getStat(start.orElse(LocalDateTime.now()).minusSeconds(1),
+                        LocalDateTime.now().plusSeconds(1), fillUris(events), true)
         );
     }
 
     public Map<Long, Integer> findEventViews(Event event) {
+        LocalDateTime start = event.getCreatedOn();
         return toStatsMap(
-                statsClient.getStat(fillUris(List.of(event)))
+                statsClient.getStat(start.minusSeconds(1), LocalDateTime.now().plusSeconds(1),
+                        fillUris(List.of(event)), true)
         );
     }
 

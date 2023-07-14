@@ -10,9 +10,6 @@ import ru.practicum.ewm.stats.dto.HitRequestDto;
 import ru.practicum.ewm.stats.dto.HitsRequestDto;
 import ru.practicum.ewm.stats.dto.StatDto;
 
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -58,15 +55,8 @@ public class StatsClientImpl implements StatsClient {
         return get(encodeTime(start), encodeTime(end), uris, unique);
     }
 
-    @Override
-    public List<StatDto> getStat(List<String> uris) {
-        log.info("Stat GET request (uris = {}) was sent", uris);
-        return get(uris);
-    }
-
     private String encodeTime(LocalDateTime time) {
-        String str = time.format(formatter);
-        return URLEncoder.encode(str, StandardCharsets.UTF_8);
+        return time.format(formatter);
     }
 
     private List<StatDto> get(String start, String end, List<String> uris, boolean unique) {
@@ -83,6 +73,8 @@ public class StatsClientImpl implements StatsClient {
         return Unirest.get(uri + "/stats")
                 .queryString("unique", true)
                 .queryString("uris", uris)
+                .queryString("start", LocalDateTime.now().minusYears(5))
+                .queryString("end", LocalDateTime.now().plusYears(5))
                 .asObject(new GenericType<List<StatDto>>(){})
                 .getBody();
     }
