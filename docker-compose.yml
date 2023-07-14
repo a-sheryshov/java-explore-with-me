@@ -10,10 +10,10 @@ services:
     depends_on:
       - stats-db
     environment:
-      - STAT_DB_URL=jdbc:postgresql://stats-db:5432/ewm_stats_database
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm_stats_database
       - SPRING_DATASOURCE_DRIVERCLASSNAME=org.postgresql.Driver
-      - DB_STAT_USER=root
-      - DB_STAT_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
   stats-db:
     image: postgres:14-alpine
@@ -38,10 +38,11 @@ services:
       - stats-server
       - ewm-db
     environment:
-      - EWM_DB_URL=jdbc:postgresql://ewm-db:5432/ewm_main_database
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm_main_database
       - SPRING_DATASOURCE_DRIVERCLASSNAME=org.postgresql.Driver
-      - DB_EWM_USER=root
-      - DB_EWM_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - STAT_SERVER_URI=http://stats-server:9090
 
   ewm-db:
     image: postgres:14-alpine
