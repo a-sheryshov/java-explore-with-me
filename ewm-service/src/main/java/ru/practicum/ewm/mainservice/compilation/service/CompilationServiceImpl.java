@@ -13,7 +13,6 @@ import ru.practicum.ewm.mainservice.compilation.mapper.CompilationMapper;
 import ru.practicum.ewm.mainservice.compilation.model.Compilation;
 import ru.practicum.ewm.mainservice.compilation.repository.CompilationRepository;
 import ru.practicum.ewm.mainservice.event.model.Event;
-import ru.practicum.ewm.mainservice.event.repository.EventRepository;
 import ru.practicum.ewm.mainservice.eventrequest.model.EventRequest;
 import ru.practicum.ewm.mainservice.util.CommonService;
 
