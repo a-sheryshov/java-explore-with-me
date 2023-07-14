@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.stats.dto.HitRequestDto;
 import ru.practicum.ewm.stats.dto.HitResponseDto;
+import ru.practicum.ewm.stats.dto.HitsRequestDto;
 import ru.practicum.ewm.stats.dto.StatDto;
 import ru.practicum.ewm.stats.service.exception.InvalidPeriodException;
 import ru.practicum.ewm.stats.service.mapper.AppMapper;
@@ -29,12 +30,17 @@ public class HitStatServiceImpl implements HitStatService {
 
     @Override
     public HitResponseDto saveHit(HitRequestDto dto) {
-        App app = getOrCreate(dto);
-
-        Hit hit = hitStatRepository.save(HitMapper.toHit(dto, app));
-        log.info("Request by ip = {} to url = {} saved", dto.getIp(), dto.getUri());
-
+        App app = getOrCreateApp(dto.getApp());
+        Hit hit = hitStatRepository.save(HitMapper.toHitList(dto, app));
+        log.info("Request by ip = {} to url = {} was saved", dto.getIp(), dto.getUri());
         return HitMapper.toResponseDto(hit);
+    }
+
+    @Override
+    public void saveHits(HitsRequestDto dto) {
+        App app = getOrCreateApp(dto.getApp());
+        hitStatRepository.saveAll(HitMapper.toHitList(dto, app));
+        log.info("Requests by ip = {} to multiple URIs (count = {}) was saved", dto.getIp(), dto.getUris().size());
     }
 
     @Override
@@ -43,9 +49,9 @@ public class HitStatServiceImpl implements HitStatService {
         return get(start, end, uris, unique);
     }
 
-    private App getOrCreate(HitRequestDto dto) {
-        return appRepository.findByName(dto.getApp())
-                .orElseGet(() -> appRepository.save(AppMapper.toApp(dto)));
+    private App getOrCreateApp(String appName) {
+        return appRepository.findByName(appName)
+                .orElseGet(() -> appRepository.save(AppMapper.toApp(appName)));
     }
 
     private List<StatDto> get(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {

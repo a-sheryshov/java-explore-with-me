@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.stats.dto.HitRequestDto;
 import ru.practicum.ewm.stats.dto.HitResponseDto;
+import ru.practicum.ewm.stats.dto.HitsRequestDto;
 import ru.practicum.ewm.stats.dto.StatDto;
 import ru.practicum.ewm.stats.service.service.HitStatService;
 
@@ -28,10 +29,18 @@ public class HitStatController {
         return hitStatService.saveHit(dto);
     }
 
+    @PostMapping("/hits")
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public void saveHits(@Valid @RequestBody HitsRequestDto dto) {
+        hitStatService.saveHits(dto);
+    }
+
     @GetMapping("/stats")
-    public List<StatDto> readStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    public List<StatDto> readStats(@RequestParam(defaultValue = "2000-01-01 00:00:00")
+                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                     LocalDateTime start,
-                                    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                    @RequestParam(defaultValue = "2100-01-01 00:00:00")
+                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
                                     LocalDateTime end,
                                     @RequestParam(required = false) List<String> uris,
                                     @RequestParam(defaultValue = "false") boolean unique) {
