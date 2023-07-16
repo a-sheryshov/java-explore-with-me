@@ -12,6 +12,7 @@ import ru.practicum.ewm.mainservice.event.dto.EventSortBy;
 import ru.practicum.ewm.mainservice.event.mapper.EventMapper;
 import ru.practicum.ewm.mainservice.event.model.Event;
 import ru.practicum.ewm.mainservice.event.model.EventStates;
+import ru.practicum.ewm.mainservice.event.service.util.AdminServiceGetAllParameter;
 import ru.practicum.ewm.mainservice.eventrequest.model.EventRequest;
 import ru.practicum.ewm.mainservice.eventrequest.repository.EventRequestRepository;
 import ru.practicum.ewm.mainservice.util.CommonService;
@@ -29,13 +30,14 @@ import java.util.stream.Collectors;
 public class EventAdminServiceImpl implements EventAdminService {
     private final CommonService commonService;
     private final EventRequestRepository eventRequestRepository;
+    private static final int MIN_HOURS_BEFORE_EVENT = 1;
 
     @Override
     @Transactional
     public EventDto update(EventRequestDto dto, long eventId) {
         Map<Long, Integer> views;
         List<EventRequest> confirmedRequests;
-        commonService.checkEventDate(dto, 1);
+        commonService.checkEventDate(dto, MIN_HOURS_BEFORE_EVENT);
         Event event = commonService.findEventOrThrow(eventId);
 
         event = commonService.update(event, dto);
@@ -46,18 +48,18 @@ public class EventAdminServiceImpl implements EventAdminService {
     }
 
     @Override
-    public List<EventDto> getAll(List<Long> userIds,
-                                     List<EventStates> states,
-                                     List<Long> categories,
-                                     LocalDateTime rangeStart,
-                                     LocalDateTime rangeEnd,
-                                     int from, int size) {
+    public List<EventDto> getAll(AdminServiceGetAllParameter parameter) {
         List<Event> events;
         Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
 
-        Pageable pageable = commonService.createPageableBySort(EventSortBy.EVENT_DATE, from, size);
-        EventQueryFilter filter = fillFilter(userIds, states, categories, rangeStart, rangeEnd);
+        Pageable pageable = commonService.createPageableBySort(EventSortBy.EVENT_DATE,
+                parameter.getFrom(), parameter.getSize());
+        EventQueryFilter filter = fillFilter(parameter.getUserIds(),
+                parameter.getStates(),
+                parameter.getCategories(),
+                parameter.getRangeStart(),
+                parameter.getRangeEnd());
 
         events = commonService.findByFilter(pageable, filter);
         confirmedRequests = commonService.findConfirmedRequests(events);

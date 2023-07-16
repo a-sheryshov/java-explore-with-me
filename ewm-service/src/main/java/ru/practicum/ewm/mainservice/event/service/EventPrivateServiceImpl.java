@@ -18,6 +18,8 @@ import ru.practicum.ewm.mainservice.eventrequest.mapper.EventRequestMapper;
 import ru.practicum.ewm.mainservice.eventrequest.model.EventRequest;
 import ru.practicum.ewm.mainservice.eventrequest.model.EventRequestStatus;
 import ru.practicum.ewm.mainservice.eventrequest.repository.EventRequestRepository;
+import ru.practicum.ewm.mainservice.exception.InvalidMethodParameterException;
+import ru.practicum.ewm.mainservice.exception.UnsupportedStateException;
 import ru.practicum.ewm.mainservice.user.model.User;
 import ru.practicum.ewm.mainservice.util.CommonService;
 import ru.practicum.ewm.mainservice.exception.OperationFailedException;
@@ -41,12 +43,12 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     private final EventRequestRepository eventRequestRepository;
     private final CommonService commonService;
     private final CategoryService categoryService;
-
+    private static final int MIN_HOURS_BEFORE_EVENT = 2;
 
     @Override
     @Transactional
     public EventDto create(EventCreateRequestDto dto, long userId) {
-        commonService.checkEventDate(dto, 2);
+        commonService.checkEventDate(dto, MIN_HOURS_BEFORE_EVENT);
         User initiator = commonService.findUserOrThrow(userId);
         Category category = categoryService.findCategoryOrThrow(dto.getCategoryId());
         Location location = commonService.findLocationOrSave(LocationMapper.toLocation(dto));
@@ -63,7 +65,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     @Override
     @Transactional
     public EventDto update(EventRequestDto dto, long userId, long eventId) {
-        commonService.checkEventDate(dto, 2);
+        commonService.checkEventDate(dto, MIN_HOURS_BEFORE_EVENT);
         Map<Long, Integer> views;
         List<EventRequest> confirmedRequests;
         User user = commonService.findUserOrThrow(userId);
@@ -142,6 +144,8 @@ public class EventPrivateServiceImpl implements EventPrivateService {
             case CONFIRMED:
                 filterAndProcessRequests(requests, event);
                 break;
+            default:
+                throw new UnsupportedStateException("Unsupported status");
         }
 
         return ProcessReqMapper.toDto(requests);
@@ -176,7 +180,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
 
     private List<EventRequest> filterRequestsByPending(List<EventRequest> requests) {
         return requests.stream()
-                .filter(r -> r.getStatus().getName().equals(EventRequestStatuses.PENDING.name()))
+                .filter(r -> Objects.equals(r.getStatus().getName(), EventRequestStatuses.PENDING.name()))
                 .collect(Collectors.toList());
     }
 
@@ -189,7 +193,9 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     }
 
     private void checkInitiator(User user, Event event) {
-        if (!Objects.equals(event.getInitiator().getId(), user.getId())) {
+        if (event.getInitiator() == null) {
+            throw new InvalidMethodParameterException("Null parameter 'event.initiator' of method 'checkInitiator'");
+        } else if (!Objects.equals(event.getInitiator().getId(), user.getId())) {
             throw new OperationFailedException(
                     "Could be modified only by creator"
             );
@@ -197,7 +203,9 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     }
 
     private void checkUpdateAvailable(Event event) {
-        if (event.getState().getName().equals(EventStates.PUBLISHED.name())) {
+        if (event.getState() == null) {
+            throw new InvalidMethodParameterException("Null parameter 'event.state' of method 'checkInitiator'");
+        } else if (Objects.equals(event.getState().getName(), EventStates.PUBLISHED.name())) {
             throw new OperationFailedException(
                     "Could not modify published events"
             );

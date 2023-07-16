@@ -11,6 +11,7 @@ import ru.practicum.ewm.mainservice.event.model.Event;
 import ru.practicum.ewm.mainservice.eventrequest.mapper.EventRequestMapper;
 import ru.practicum.ewm.mainservice.eventrequest.model.EventRequest;
 import ru.practicum.ewm.mainservice.eventrequest.repository.EventRequestRepository;
+import ru.practicum.ewm.mainservice.exception.InvalidMethodParameterException;
 import ru.practicum.ewm.mainservice.user.model.User;
 import ru.practicum.ewm.mainservice.util.CommonService;
 import ru.practicum.ewm.mainservice.exception.OperationFailedException;
@@ -24,6 +25,7 @@ import java.util.Objects;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class EventRequestServiceImpl implements EventRequestService {
+    private static final int EVENT_STATE_PUBLISHED_ID = 2;
     private final EventRequestRepository eventRequestRepository;
     private final CommonService commonService;
 
@@ -83,12 +85,15 @@ public class EventRequestServiceImpl implements EventRequestService {
     }
 
     private void checkCreateAvailability(User user, Event event, List<EventRequest> confirmedRequests) {
-        if (Objects.equals(event.getInitiator().getId(), user.getId())) {
+        if (event.getInitiator() == null) {
+            throw new InvalidMethodParameterException("Null parameter event.initiator "
+                    + " of method 'checkCreateAvailability'");
+        } else if (Objects.equals(event.getInitiator().getId(), user.getId())) {
             throw new OperationFailedException(
                     "Wrong event request - from event initiator"
             );
         }
-        if (event.getState().getId() != 2) {
+        if (event.getState().getId() != EVENT_STATE_PUBLISHED_ID) {
             throw new OperationFailedException(
                     "Wrong event request - event was not published"
             );
@@ -106,7 +111,10 @@ public class EventRequestServiceImpl implements EventRequestService {
     }
 
     private void checkCancelAvailability(User user, EventRequest request) {
-        if (!Objects.equals(request.getRequester().getId(), user.getId())) {
+        if (request.getRequester() == null) {
+            throw new InvalidMethodParameterException("Null parameter 'request.requester'"
+                    + " of method checkCancelAvailability");
+        } else if (!Objects.equals(request.getRequester().getId(), user.getId())) {
             throw new OperationFailedException(
                     "Could be canceled only by request creator"
             );

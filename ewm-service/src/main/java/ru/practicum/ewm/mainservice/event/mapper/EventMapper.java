@@ -5,7 +5,6 @@ import ru.practicum.ewm.mainservice.category.mapper.CategoryMapper;
 import ru.practicum.ewm.mainservice.category.model.Category;
 import ru.practicum.ewm.mainservice.event.dto.EventCreateRequestDto;
 import ru.practicum.ewm.mainservice.event.dto.EventDto;
-import ru.practicum.ewm.mainservice.event.dto.EventRequestDto;
 import ru.practicum.ewm.mainservice.event.dto.EventShortDto;
 import ru.practicum.ewm.mainservice.event.model.Event;
 import ru.practicum.ewm.mainservice.event.model.Location;
@@ -19,22 +18,6 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class EventMapper {
-    public static Event toEvent(EventRequestDto dto, Category category, Location location, User user) {
-        Event event = new Event();
-
-        event.setAnnotation(dto.getAnnotation());
-        event.setCategory(category);
-        event.setDescription(dto.getDescription());
-        event.setEventDate(dto.getEventDate());
-        event.setInitiator(user);
-        event.setLocation(location);
-        event.setPaid(dto.getPaid());
-        event.setParticipantLimit(dto.getParticipantLimit());
-        event.setRequestModeration(dto.getRequestModeration());
-        event.setTitle(dto.getTitle());
-
-        return event;
-    }
 
     public static Event toEvent(EventCreateRequestDto dto, Category category, Location location, User user) {
         Event event = new Event();

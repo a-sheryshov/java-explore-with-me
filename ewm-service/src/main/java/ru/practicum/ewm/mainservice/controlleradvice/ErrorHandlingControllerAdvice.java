@@ -12,6 +12,7 @@ import ru.practicum.ewm.mainservice.controlleradvice.dto.ApiErrorDto;
 import ru.practicum.ewm.mainservice.exception.InvalidPeriodException;
 import ru.practicum.ewm.mainservice.exception.ObjectNotExistsException;
 import ru.practicum.ewm.mainservice.exception.OperationFailedException;
+import ru.practicum.ewm.mainservice.exception.UnsupportedStateException;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
@@ -172,6 +173,19 @@ public class ErrorHandlingControllerAdvice {
                 e.getMessage(),
                 "Operation failed",
                 HttpStatus.CONFLICT,
+                LocalDateTime.now());
+    }
+
+    @ExceptionHandler(UnsupportedStateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ApiErrorDto onUnsupportedStatusException(UnsupportedStateException e) {
+        log.error(e.getMessage());
+        return new ApiErrorDto(
+                Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList()),
+                e.getMessage(),
+                "Unsupported state",
+                HttpStatus.BAD_REQUEST,
                 LocalDateTime.now());
     }
 

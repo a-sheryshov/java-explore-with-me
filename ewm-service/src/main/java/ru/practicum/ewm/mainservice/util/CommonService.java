@@ -28,14 +28,12 @@ import ru.practicum.ewm.mainservice.eventrequest.model.EventRequest;
 import ru.practicum.ewm.mainservice.eventrequest.model.EventRequestStatus;
 import ru.practicum.ewm.mainservice.eventrequest.repository.EventRequestRepository;
 import ru.practicum.ewm.mainservice.eventrequest.repository.EventRequestStatusRepository;
+import ru.practicum.ewm.mainservice.exception.*;
 import ru.practicum.ewm.mainservice.user.model.User;
 import ru.practicum.ewm.mainservice.user.repository.UserRepository;
-import ru.practicum.ewm.mainservice.exception.ObjectNotExistsException;
-import ru.practicum.ewm.mainservice.exception.OperationFailedException;
 import ru.practicum.ewm.stats.client.StatsClient;
 import ru.practicum.ewm.stats.dto.StatDto;
 import ru.practicum.ewm.mainservice.event.mapper.LocationMapper;
-import ru.practicum.ewm.mainservice.exception.InvalidPeriodException;
 import ru.practicum.ewm.mainservice.util.querydsl.EventQueryFilter;
 import ru.practicum.ewm.mainservice.util.querydsl.QueryPredicates;
 
@@ -106,6 +104,8 @@ public class CommonService {
             case SEND_TO_REVIEW:
                 updateToPending(event);
                 break;
+            default:
+                throw new UnsupportedStateException("Unsupported state");
         }
     }
 
@@ -130,7 +130,9 @@ public class CommonService {
     }
 
     public void updateToReject(Event event) {
-        if (!event.getState().getName().equals(EventStates.PUBLISHED.name())) {
+        if (event.getState() == null) {
+            throw new InvalidMethodParameterException("Null parameter 'event.state' of method 'updateToReject'");
+        } else if (!Objects.equals(event.getState().getName(), EventStates.PUBLISHED.name())) {
             event.setState(findEventStateOrThrow(EventStates.CANCELED));
         } else {
             throw new OperationFailedException(
@@ -291,7 +293,7 @@ public class CommonService {
     }
 
     public Pageable createPageableBySort(EventSortBy sort, int from, int size) {
-        if (sort.equals(EventSortBy.VIEWS)) {
+        if (Objects.equals(sort, EventSortBy.VIEWS)) {
             return createPageable("views", from, size);
         } else {
             return createPageable("eventDate", from, size);
