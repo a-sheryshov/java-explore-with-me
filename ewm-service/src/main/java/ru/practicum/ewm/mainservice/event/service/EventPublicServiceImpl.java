@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.mainservice.event.dto.EventDto;
 import ru.practicum.ewm.mainservice.event.dto.EventShortDto;
-import ru.practicum.ewm.mainservice.event.dto.EventSortBy;
 import ru.practicum.ewm.mainservice.event.mapper.EventMapper;
 import ru.practicum.ewm.mainservice.event.model.Event;
+import ru.practicum.ewm.mainservice.event.service.util.PublicServiceGetAllParameter;
 import ru.practicum.ewm.mainservice.eventrequest.model.EventRequest;
 import ru.practicum.ewm.mainservice.exception.InvalidPeriodException;
 import ru.practicum.ewm.mainservice.util.CommonService;
@@ -34,20 +34,21 @@ public class EventPublicServiceImpl implements EventPublicService {
     public static final String APP_NAME = "ewm-main-service";
 
     @Override
-    public List<EventShortDto> getAll(String text, List<Long> categories, Boolean paid,
-                                      LocalDateTime rangeStart,
-                                      LocalDateTime rangeEnd,
-                                      boolean onlyAvailable,
-                                      EventSortBy sort,
-                                      int from, int size,
-                                      String ip) {
+    public List<EventShortDto> getAll(PublicServiceGetAllParameter parameter) {
         List<Event> events;
         Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
 
-        checkRangePeriod(rangeStart, rangeEnd);
-        EventQueryFilter filter = fillFilter(text, categories, paid, rangeStart, rangeEnd, onlyAvailable);
-        Pageable pageable = commonService.createPageableBySort(sort, from, size);
+        checkRangePeriod(parameter.getRangeStart(), parameter.getRangeEnd());
+        EventQueryFilter filter = fillFilter(parameter.getText(),
+                parameter.getCategories(),
+                parameter.getPaid(),
+                parameter.getRangeStart(),
+                parameter.getRangeEnd(),
+                parameter.isOnlyAvailable());
+        Pageable pageable = commonService.createPageableBySort(parameter.getSort(),
+                parameter.getFrom(),
+                parameter.getSize());
 
         events = commonService.findByFilter(pageable, filter);
         log.info("Response for events by filter was returned");
@@ -60,7 +61,7 @@ public class EventPublicServiceImpl implements EventPublicService {
         statsClient.saveHits(HitsRequestDto.builder()
                 .app(APP_NAME)
                 .uris(uris)
-                .ip(ip)
+                .ip(parameter.getIp())
                 .timeStamp(LocalDateTime.now())
                 .build());
         log.info("Saving stats");

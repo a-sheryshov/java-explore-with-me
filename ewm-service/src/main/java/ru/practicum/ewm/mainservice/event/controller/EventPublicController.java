@@ -8,6 +8,7 @@ import ru.practicum.ewm.mainservice.event.dto.EventDto;
 import ru.practicum.ewm.mainservice.event.dto.EventShortDto;
 import ru.practicum.ewm.mainservice.event.dto.EventSortBy;
 import ru.practicum.ewm.mainservice.event.service.EventPublicService;
+import ru.practicum.ewm.mainservice.event.service.util.PublicServiceGetAllParameter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
@@ -36,8 +37,15 @@ public class EventPublicController {
                                             @RequestParam(name = "sort", defaultValue = "EVENT_DATE") EventSortBy sort,
                                             @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero int from,
                                             @RequestParam(name = "size", defaultValue = "10") @Positive int size) {
-        return eventPublicService.getAll(text, categories, paid, rangeStart, rangeEnd,
-                onlyAvailable, sort, from, size, request.getRemoteAddr());
+        return eventPublicService.getAll(PublicServiceGetAllParameter.builder()
+                .text(text)
+                .categories(categories)
+                .paid(paid)
+                .rangeStart(rangeStart)
+                .rangeEnd(rangeEnd)
+                .onlyAvailable(onlyAvailable)
+                .sort(sort).from(from).size(size).ip(request.getRemoteAddr())
+                .build());
     }
 
     @GetMapping("/{id}")

@@ -9,6 +9,7 @@ import ru.practicum.ewm.mainservice.eventrequest.model.EventRequest;
 
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @UtilityClass
@@ -19,12 +20,12 @@ public class ProcessReqMapper {
         return ProcessReqResponseDto.builder()
                 .confirmedRequests(
                         mappedRequests.stream()
-                                .filter(r -> r.getStatus().equals(EventRequestStatuses.CONFIRMED.name()))
+                                .filter(r -> Objects.equals(r.getStatus(),EventRequestStatuses.CONFIRMED.name()))
                                 .collect(Collectors.toList())
                 )
                 .rejectedRequests(
                         mappedRequests.stream()
-                                .filter(r -> r.getStatus().equals(EventRequestStatuses.REJECTED.name()))
+                                .filter(r -> Objects.equals(r.getStatus(), EventRequestStatuses.REJECTED.name()))
                                 .collect(Collectors.toList())
                 )
                 .build();

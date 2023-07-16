@@ -2,7 +2,6 @@ package ru.practicum.ewm.mainservice.compilation.mapper;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.ewm.mainservice.compilation.dto.CompilationCreateRequestDto;
-import ru.practicum.ewm.mainservice.compilation.dto.CompilationRequestDto;
 import ru.practicum.ewm.mainservice.compilation.dto.CompilationResponseDto;
 import ru.practicum.ewm.mainservice.compilation.model.Compilation;
 import ru.practicum.ewm.mainservice.event.mapper.EventMapper;
@@ -16,12 +15,6 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class CompilationMapper {
-    public static Compilation toCompilation(CompilationRequestDto dto) {
-        Compilation compilation = new Compilation();
-        compilation.setPinned(dto.getPinned());
-        compilation.setTitle(dto.getTitle());
-        return compilation;
-    }
 
     public static Compilation toCompilation(CompilationCreateRequestDto dto) {
         Compilation compilation = new Compilation();
