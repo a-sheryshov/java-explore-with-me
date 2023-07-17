@@ -10,7 +10,7 @@ import ru.practicum.ewm.mainservice.event.dto.EventDto;
 import ru.practicum.ewm.mainservice.event.dto.EventShortDto;
 import ru.practicum.ewm.mainservice.event.mapper.EventMapper;
 import ru.practicum.ewm.mainservice.event.model.Event;
-import ru.practicum.ewm.mainservice.event.service.util.PublicServiceGetAllParameter;
+import ru.practicum.ewm.mainservice.event.service.util.PublicServiceGetAllQuery;
 import ru.practicum.ewm.mainservice.eventrequest.model.EventRequest;
 import ru.practicum.ewm.mainservice.exception.InvalidPeriodException;
 import ru.practicum.ewm.mainservice.util.CommonService;
@@ -34,7 +34,7 @@ public class EventPublicServiceImpl implements EventPublicService {
     public static final String APP_NAME = "ewm-main-service";
 
     @Override
-    public List<EventShortDto> getAll(PublicServiceGetAllParameter parameter) {
+    public List<EventShortDto> getAll(PublicServiceGetAllQuery parameter) {
         List<Event> events;
         Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;
