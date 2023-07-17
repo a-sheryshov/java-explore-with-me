@@ -12,7 +12,7 @@ import ru.practicum.ewm.mainservice.event.dto.EventSortBy;
 import ru.practicum.ewm.mainservice.event.mapper.EventMapper;
 import ru.practicum.ewm.mainservice.event.model.Event;
 import ru.practicum.ewm.mainservice.event.model.EventStates;
-import ru.practicum.ewm.mainservice.event.service.util.AdminServiceGetAllParameter;
+import ru.practicum.ewm.mainservice.event.service.util.AdminServiceGetAllQuery;
 import ru.practicum.ewm.mainservice.eventrequest.model.EventRequest;
 import ru.practicum.ewm.mainservice.eventrequest.repository.EventRequestRepository;
 import ru.practicum.ewm.mainservice.util.CommonService;
@@ -48,7 +48,7 @@ public class EventAdminServiceImpl implements EventAdminService {
     }
 
     @Override
-    public List<EventDto> getAll(AdminServiceGetAllParameter parameter) {
+    public List<EventDto> getAll(AdminServiceGetAllQuery parameter) {
         List<Event> events;
         Map<Long, Integer> views;
         Map<Event, List<EventRequest>> confirmedRequests;

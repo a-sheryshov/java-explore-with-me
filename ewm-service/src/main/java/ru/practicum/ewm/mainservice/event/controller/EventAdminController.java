@@ -8,7 +8,7 @@ import ru.practicum.ewm.mainservice.event.dto.EventDto;
 import ru.practicum.ewm.mainservice.event.dto.EventRequestDto;
 import ru.practicum.ewm.mainservice.event.model.EventStates;
 import ru.practicum.ewm.mainservice.event.service.EventAdminService;
-import ru.practicum.ewm.mainservice.event.service.util.AdminServiceGetAllParameter;
+import ru.practicum.ewm.mainservice.event.service.util.AdminServiceGetAllQuery;
 import ru.practicum.ewm.mainservice.util.validation.UpdateValidationGroup;
 
 import javax.validation.Valid;
@@ -42,7 +42,7 @@ public class EventAdminController {
                                            @PositiveOrZero int from,
                                            @RequestParam(name = "size", defaultValue = "10")
                                            @Positive int size) {
-        return eventAdminServiceService.getAll(AdminServiceGetAllParameter.builder()
+        return eventAdminServiceService.getAll(AdminServiceGetAllQuery.builder()
                         .userIds(userIds)
                         .states(states)
                         .categories(categories)
