@@ -158,7 +158,7 @@ public class CommonService {
     }
 
     public EventState findEventStateOrThrow(EventStates state) {
-        return eventStateRepository.findByName(state.toString())
+        return eventStateRepository.findByName(state.name())
                 .orElseThrow(() -> new ObjectNotExistsException(
                         String.format("Status name = %s not exists", state))
                 );
