@@ -42,6 +42,7 @@ public class CommentPrivateServiceImpl implements CommentPrivateService {
             throw new OperationFailedException("Operation denied");
         }
         commentRepository.deleteById(commentId);
+        log.info("Comment id = {} was deleted", commentId);
     }
 
     @Override

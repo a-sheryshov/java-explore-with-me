@@ -26,7 +26,7 @@ public class CommentPrivateController {
 
     @PostMapping("comments/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentResponseDto addComment(@PathVariable Long userId,
+    public CommentResponseDto createComment(@PathVariable Long userId,
                                          @Valid @RequestBody CommentCreateRequestDto commentDtoCreate) {
         return commentService.createComment(commentDtoCreate, userId);
     }
